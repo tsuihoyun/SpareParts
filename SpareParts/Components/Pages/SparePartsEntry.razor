@@ -1,0 +1,161 @@
+@page "/spare-parts/add"
+@page "/spare-parts/edit/{Id:guid}"
+@using SpareParts.Models
+@using SpareParts.Data
+@inject AppDbContext DbContext
+@inject NavigationManager Nav
+@rendermode InteractiveServer
+
+<PageTitle>@(Id == null ? "新增备件" : "编辑备件")</PageTitle>
+
+<h2>@(Id == null ? "新增备件" : "编辑备件")</h2>
+
+<EditForm Model="form" OnValidSubmit="HandleSubmit" FormName="SparePartsForm">
+    <DataAnnotationsValidator />
+    <ValidationSummary />
+
+    <div class="row g-3">
+        <div class="col-md-3">
+            <label class="form-label">物品编码</label>
+            <InputText class="form-control" @bind-Value="form.物品编码" />
+        </div>
+        <div class="col-md-3">
+            <label class="form-label">备件名称</label>
+            <InputText class="form-control" @bind-Value="form.备件名称" />
+        </div>
+        <div class="col-md-3">
+            <label class="form-label">物资类别</label>
+            <InputText class="form-control" @bind-Value="form.物资类别" />
+        </div>
+        <div class="col-md-3">
+            <label class="form-label">常用件类别</label>
+            <InputText class="form-control" @bind-Value="form.常用件类别" />
+        </div>
+
+        <div class="col-md-2">
+            <label class="form-label">单位</label>
+            <InputText class="form-control" @bind-Value="form.单位" />
+        </div>
+        <div class="col-md-2">
+            <label class="form-label">统计数量</label>
+            <InputNumber class="form-control" @bind-Value="form.统计数量" />
+        </div>
+        <div class="col-md-2">
+            <label class="form-label">结存数量</label>
+            <InputNumber class="form-control" @bind-Value="form.结存数量" />
+        </div>
+        <div class="col-md-2">
+            <label class="form-label">单价</label>
+            <InputNumber class="form-control" @bind-Value="form.单价" />
+        </div>
+        <div class="col-md-2">
+            <label class="form-label">金额</label>
+            <InputNumber class="form-control" @bind-Value="form.金额" />
+        </div>
+
+        <div class="col-md-3">
+            <label class="form-label">仓库位置</label>
+            <InputText class="form-control" @bind-Value="form.仓库位置" />
+        </div>
+        <div class="col-md-3">
+            <label class="form-label">货架位置</label>
+            <InputText class="form-control" @bind-Value="form.货架位置" />
+        </div>
+        <div class="col-md-3">
+            <label class="form-label">规格型号</label>
+            <InputText class="form-control" @bind-Value="form.规格型号" />
+        </div>
+        <div class="col-md-3">
+            <label class="form-label">供应商</label>
+            <InputText class="form-control" @bind-Value="form.供应商" />
+        </div>
+
+        <div class="col-md-3">
+            <label class="form-label">品牌</label>
+            <InputText class="form-control" @bind-Value="form.品牌" />
+        </div>
+        <div class="col-md-3">
+            <label class="form-label">使用设备</label>
+            <InputText class="form-control" @bind-Value="form.使用设备" />
+        </div>
+        <div class="col-md-3">
+            <label class="form-label">入库年份</label>
+            <InputText class="form-control" @bind-Value="form.入库年份" />
+        </div>
+        <div class="col-md-3">
+            <label class="form-label">预计使用日期</label>
+            <InputText class="form-control" @bind-Value="form.预计使用日期" />
+        </div>
+
+        <div class="col-md-3">
+            <label class="form-label">申报人</label>
+            <InputText class="form-control" @bind-Value="form.申报人" />
+        </div>
+        <div class="col-md-3">
+            <label class="form-label">申报日期</label>
+            <InputDate class="form-control" @bind-Value="form.申报日期" />
+        </div>
+        <div class="col-md-3">
+            <label class="form-label">到货日期</label>
+            <InputDate class="form-control" @bind-Value="form.到货日期" />
+        </div>
+        <div class="col-md-3">
+            <label class="form-label">滞留原因</label>
+            <InputText class="form-control" @bind-Value="form.滞留原因" />
+        </div>
+
+        <div class="col-md-3">
+            <label class="form-label">维修人员</label>
+            <InputText class="form-control" @bind-Value="form.维修人员" />
+        </div>
+        <div class="col-md-3">
+            <label class="form-label">领用人</label>
+            <InputText class="form-control" @bind-Value="form.领用人" />
+        </div>
+        <div class="col-md-3">
+            <label class="form-label">领用时间</label>
+            <InputDate class="form-control" @bind-Value="form.领用时间" />
+        </div>
+
+        <div class="col-12">
+            <label class="form-label">备注</label>
+            <InputTextArea class="form-control" rows="3" @bind-Value="form.备注" />
+        </div>
+    </div>
+
+    <div class="mt-4 d-flex gap-2">
+        <button type="submit" class="btn btn-primary">保存</button>
+        <a class="btn btn-secondary" href="/spare-parts">取消</a>
+    </div>
+</EditForm>
+
+@code {
+    [Parameter] public Guid? Id { get; set; }
+
+    private 备件动态 form = new();
+
+    protected override async Task OnParametersSetAsync()
+    {
+        if (Id.HasValue)
+        {
+            var existing = await DbContext.备件动态.FindAsync(Id.Value);
+            if (existing != null)
+                form = existing;
+        }
+    }
+
+    private async Task HandleSubmit()
+    {
+        if (Id.HasValue)
+        {
+            DbContext.备件动态.Update(form);
+        }
+        else
+        {
+            form.备件ID = Guid.NewGuid();
+            DbContext.备件动态.Add(form);
+        }
+        await DbContext.SaveChangesAsync();
+        Nav.NavigateTo("/spare-parts");
+    }
+}
